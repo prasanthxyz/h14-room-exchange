@@ -1,0 +1,47 @@
+<html>
+<body>
+<form action="#" method="POST">
+    <label>Name</label> <input name="name" value={{name}} /> <br />
+    <label>Roll No.</label> <input name="rollno" value={{rollno}} /> <br />
+    <label>Room No.</label> <input name="roomno" value="{{roomno}}" /> <br />
+    <input type="submit"/> <br /> <br />
+    <input id="searchstring" type="text" onkeyup="populateList()" />
+    <div id="roomlist">
+        <table id="roomstable">
+        </table>
+    </div>
+</form>
+
+
+<script type="text/javascript">
+    var rooms = new Array();
+    function populateList() {
+        $('#roomstable').empty();
+        searchString = $('#searchstring').val();
+        console.log(searchString);
+        rooms.forEach(function(room) {
+            if(room.toLowerCase().indexOf(searchString.toLowerCase()) > -1) {
+                $('#roomstable').append('<tr><td><input name="roomsarray[]" type="checkbox" value="'+room+'" />'+ room + '</td></tr>');
+            }
+        });
+    }
+</script>
+
+<script src="/static/js/jquery.min.js"></script>
+<script type="text/javascript">
+$.ajax({
+    dataType: "json",
+    url: "/getRooms/",
+    success: function(res) {
+        rooms = res;
+        populateList();
+    }
+});
+</script>
+
+{% for reln in relns %}
+    {{reln.to_person.name}}
+{% endfor %}
+
+</body>
+</html>
