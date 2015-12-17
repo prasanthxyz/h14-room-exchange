@@ -1,47 +1,155 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" >
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+</head>
 <body>
-<form action="#" method="POST">
-    <label>Name</label> <input name="name" value={{name}} /> <br />
-    <label>Roll No.</label> <input name="rollno" value={{rollno}} /> <br />
-    <label>Room No.</label> <input name="roomno" value="{{roomno}}" /> <br />
-    <input type="submit"/> <br /> <br />
-    <input id="searchstring" type="text" onkeyup="populateList()" />
-    <div id="roomlist">
-        <table id="roomstable">
-        </table>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Room Exchange System</a>
+            </div>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#"><span class="glyphicon glyphicon-user"></span> {{person.name.title}} </a></li>
+                <li><a href="/logout/"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="jumbotron">
+            <h2>Hello {{person.name.title}}, Welcome to hostel 14 room exchange system!</h2> 
+
+            <div class="row">
+            <form action="#" method="POST" role="form">
+                {% csrf_token %}
+                <div class="col-sm-4" >
+                    <div class="panel panel-default">
+                        <div class="panel-heading">My Room</div>
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <p>Currently allocated Room: </p>
+                                {% if person.roomno == "" %}
+                                <input type="text" class="form-control" name="roomno">
+                                <div class="well well-sm">Submitting your room number means you are willing for room exchange.</div>
+                                <div class="alert alert-warning"> Room number once submitted cannot be changed afterwards. </div>
+                                {% else %}
+                                <input type="hidden" name="roomno" value="{{person.roomno}}">
+                                <input disabled="disabled" type="text" class="form-control" value="{{person.roomno}}">
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <p> My Phone Number: </p>
+                                <input type="text" class="form-control" name="phno" value="{{person.phno}}" />
+                            </div>
+                            <div class="form-group">
+                                <input type="submit" class="btn btn-default" value="Submit" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            {% if person.roomno != "" %}
+            <div class="col-sm-4" >
+                <div class="panel panel-default">
+                    <div class="panel-heading">Rooms available for exchange</div>
+                    <div class="panel-body">
+                        <input type="text" class="form-control" placeholder="Search"  id="searchstring" onkeyup="populateList()">
+                        <ul class="list-group" style="max-height:300px;overflow-y:scroll" id="roomstable" >
+                        </ul>
+                        {% if person.roomno != "" %}
+                        <button type="submit" class="btn btn-default">Submit</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </form>
+
+        {% if person.roomno != "" %}
+        <div class="col-sm-4" >
+            <div class="panel panel-default">
+                <div class="panel-heading">People who want your room</div>
+                <div class="panel-body">
+                    <ul class="list-group" style="max-height:300px;overflow-y:scroll" >
+                        {% for reln in relns %}
+                        <li class="list-group-item">{{reln.from_person.roomno}} - {{reln.from_person.name.title}} ({{reln.from_person.phno}})</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-4" >
+            <div class="panel panel-default">
+                <div class="panel-heading">Mutual Interests</div>
+                <div class="panel-body">
+                    <ul class="list-group" style="max-height:300px;overflow-y:scroll" >
+                        {% for person in matches %}
+                        <li class="list-group-item">{{person.roomno}} - {{person.name.title}} ({{person.phno}})</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
     </div>
-</form>
+    <div class="row">
+        <div class="col-sm-4" >
+            <!--        <div class="panel panel-default">
+                        <div class="panel-heading">Group Exchange</div>
+                        <div class="panel-body">
+            I am also interested to move in as a group. My preferred neighbours are
+            <input type="text" class="form-control" placeholder="Search" id="search">
+            <ul class="list-group" style="max-height:300px;overflow-y:scroll" >
+                <li class="list-group-item">First person <div class="pull-right"><input type="checkbox" value=""></div></li>
+                <li class="list-group-item">Second person<div class="pull-right"><input type="checkbox" value=""></div></li>
+                <li class="list-group-item">Third person<div class="pull-right"><input type="checkbox" value=""></div></li>
+            </ul>
 
-
-<script type="text/javascript">
-    var rooms = new Array();
-    function populateList() {
-        $('#roomstable').empty();
-        searchString = $('#searchstring').val();
-        console.log(searchString);
-        rooms.forEach(function(room) {
-            if(room.toLowerCase().indexOf(searchString.toLowerCase()) > -1) {
-                $('#roomstable').append('<tr><td><input name="roomsarray[]" type="checkbox" value="'+room+'" />'+ room + '</td></tr>');
+            </div>
+            </div>
+            </div>
+            </div>
+            </div>
+            </div> -->
+        </div>
+        <script type="text/javascript">
+var rooms = new Array();
+function populateList() {
+    $('#roomstable').empty();
+    searchString = $('#searchstring').val();
+    console.log(searchString);
+    rooms.forEach(function(room) {
+            var item = room[0]+' - '+room[2];
+            if(item.toLowerCase().indexOf(searchString.toLowerCase()) > -1) {
+            if(room[1] == "yes"){
+            var newnode = '<li class="list-group-item">'+item+'<div class="pull-right"><input type="checkbox" name="roomsarray[]" checked="checked" value="'+room[0]+'"></div></li>';
+            $('#roomstable').append(newnode);
             }
-        });
-    }
-</script>
-
-<script src="/static/js/jquery.min.js"></script>
-<script type="text/javascript">
+            else{
+            var newnode = '<li class="list-group-item">'+item+'<div class="pull-right"><input type="checkbox" name="roomsarray[]" value="'+room[0]+'"></div></li>';
+            $('#roomstable').append(newnode);
+            }
+            }
+            });
+}
+        </script>
+        <script type="text/javascript">
 $.ajax({
     dataType: "json",
     url: "/getRooms/",
     success: function(res) {
         rooms = res;
+        console.log(res);
         populateList();
     }
 });
 </script>
-
-{% for reln in relns %}
-    {{reln.to_person.name}}
-{% endfor %}
-
-</body>
-</html>
+    </body>
+    </html>

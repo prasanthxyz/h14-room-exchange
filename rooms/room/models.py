@@ -4,6 +4,7 @@ class Person(models.Model):
     name = models.CharField(max_length=500)
     roomno = models.CharField(max_length=20)
     rollno = models.CharField(max_length=20)
+    phno = models.CharField(default="",max_length=30)
     def __unicode__(self):
         return self.name+", "+self.roomno
 

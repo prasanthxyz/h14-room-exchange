@@ -24,8 +24,11 @@ SECRET_KEY = 'lw!!oy9c8589@4_^a-n$=zh06+z^^bnk6a_k@nbj2y1$t-)075'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '*',  # Allow domain and subdomains
+]
 
 
 # Application definition
@@ -105,3 +108,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+
+AUTHENTICATION_BACKENDS = (
+    'django_auth_ldap.backend.LDAPBackend',
+#    'django.contrib.auth.backends.ModelBackend',
+)
+
+AUTH_LDAP_SERVER_URI = "ldap://ldap.iitb.ac.in"
